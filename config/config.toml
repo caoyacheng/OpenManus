@@ -1,0 +1,13 @@
+# Global LLM configuration
+[llm]
+model = "qwen-max"
+base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+api_key = "sk-480849ca931b4a4e87bf3f55719edcfa"
+max_tokens = 8192
+temperature = 0.0
+
+# Optional configuration for specific LLM models
+[llm.vision]
+model = "qwen-max"
+base_url = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+api_key = "sk-480849ca931b4a4e87bf3f55719edcfa"
