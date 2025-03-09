@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenManus 前端界面</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>OpenManus 前端界面</h1>
+        </div>
+
+        <div class="input-section">
+            <h2>输入</h2>
+            <form id="commandForm">
+                <div class="form-group">
+                    <label for="userInput">请输入您的命令或查询：</label>
+                    <textarea id="userInput" placeholder="在此输入..." required></textarea>
+                </div>
+                <button type="submit" id="submitBtn">提交</button>
+            </form>
+            <div id="error" class="error"></div>
+        </div>
+
+        <div class="output-section">
+            <h2>输出</h2>
+            <div id="loading" class="loading" style="display: none;">正在处理您的请求，请稍候...</div>
+            
+            <div id="logSection" style="display: none;">
+                <h3>日志输出：</h3>
+                <div id="logs" class="log-output"></div>
+            </div>
+            
+            <div id="resultSection" style="display: none;">
+                <h3>结果：</h3>
+                <div id="result" class="result-output"></div>
+            </div>
+            
+            <div id="emptyState" class="empty-state">
+                提交请求后，日志和结果将显示在这里
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/script.js"></script>
+</body>
+</html>

@@ -1,95 +1,144 @@
-# OpenManus 🙋
-Manus is incredible, but OpenManus can achieve any ideas without an Invite Code 🛫!
+# OpenManus 前端界面
 
-Our team members @mannaandpoem @XiangJinyu @MoshiQAQ @didiforgithub from @MetaGPT built it within 3 hours!
+这是一个用于OpenManus的前端界面，允许用户输入命令并查看后端程序的日志和结果。
 
-It's a simple implementation, so we welcome any suggestions, contributions, and feedback!
+## 项目结构
 
-Enjoy your own agent with OpenManus!
+项目分为两个主要部分：
 
-## Project Demo
-[Demo Video](https://github.com/mannaandpoem/OpenManus/blob/main/demo/seo_website.mp4)
+- `frontend/`: React前端应用
+- `backend/`: Express后端服务器
 
+## 功能特点
 
-## Installation
+- 用户可以输入命令或查询
+- 后端执行命令并返回结果
+- 实时显示命令执行的日志
+- 保存所有执行记录到日志文件
+- 简洁直观的用户界面
 
-1. Create a new conda environment:
+## 实时日志显示功能
+
+我们实现了实时显示后端处理日志的功能，使用户能够实时看到命令执行的进度和详细信息。
+
+### 后端实现
+
+添加了实时日志更新机制：
+- 创建了一个专门的线程来实时更新请求状态中的日志信息
+- 该线程每0.1秒从日志捕获器中获取最新日志并更新状态
+- 使用守护线程确保主线程结束时自动结束日志更新线程
+- 代码片段：
+```python
+# 创建一个线程来实时更新日志
+def update_logs():
+    while not request_status[request_id]['completed']:
+        # 获取当前日志
+        current_logs = req_log_capturer.get_logs()
+        
+        # 更新请求状态中的日志
+        request_status[request_id]['logs'] = current_logs
+        
+        # 每0.1秒更新一次
+        import time
+        time.sleep(0.1)
+```
+
+### 前端实现
+
+前端实现了轮询状态API的功能：
+- 每秒轮询一次后端状态API获取最新日志
+- 实时更新日志输出区域，显示处理过程中的详细信息
+- 自动滚动日志到底部，确保用户始终看到最新信息
+- 当处理完成时，显示最终结果并停止轮询
+
+### 技术要点
+
+实现这一功能的关键技术点：
+- 使用多线程技术实现后端日志的实时捕获和更新
+- 前端采用轮询机制定期获取最新状态
+- 使用守护线程确保资源的正确释放
+- 保持前端UI的响应性，同时显示实时更新的日志
+
+这些改进使得用户能够实时看到后端处理的进度和详细日志，而不是只能看到"正在处理您的请求，请稍候..."的提示，大大提升了系统的可用性和用户体验。
+
+## 安装与运行
+
+### 前提条件
+
+- Node.js (v14+)
+- npm 或 yarn
+
+### 安装依赖
+
+1. 安装前端依赖：
 
 ```bash
-conda create -n open_manus python=3.12
-conda activate open_manus
+cd frontend
+npm install
 ```
 
-2. Clone the repository:
+2. 安装后端依赖：
 
 ```bash
-git clone https://github.com/mannaandpoem/OpenManus.git
-cd OpenManus
+cd backend
+npm install
 ```
 
-3. Install dependencies:
+### 运行应用
+
+1. 启动后端服务器：
 
 ```bash
-pip install -r requirements.txt
+cd backend
+npm start
 ```
 
-## Configuration
+后端服务器将在 http://localhost:5000 上运行。
 
-OpenManus requires configuration for the LLM APIs it uses. Follow these steps to set up your configuration:
-
-1. Create a `config.toml` file in the `config` directory (you can copy from the example):
+2. 启动前端开发服务器：
 
 ```bash
-cp config/config.example.toml config/config.toml
+cd frontend
+npm start
 ```
 
-2. Edit `config/config.toml` to add your API keys and customize settings:
+前端开发服务器将在 http://localhost:3000 上运行。
 
-```toml
-# Global LLM configuration
-[llm]
-model = "gpt-4o"
-base_url = "https://api.openai.com/v1"
-api_key = "sk-..."  # Replace with your actual API key
-max_tokens = 4096
-temperature = 0.0
+### 构建生产版本
 
-# Optional configuration for specific LLM models
-[llm.vision]
-model = "gpt-4o"
-base_url = "https://api.openai.com/v1"
-api_key = "sk-..."  # Replace with your actual API key
-```
-
-## Quick Start
-One line for run OpenManus:
+要构建前端的生产版本：
 
 ```bash
-python main.py
+cd frontend
+npm run build
 ```
 
-Then input your idea via terminal!
+构建后的文件将位于 `frontend/build` 目录中，可以由后端服务器提供服务。
 
-For unstable version, you also can run:
+## API 端点
 
-```bash
-python run_flow.py
-```
+后端提供以下API端点：
 
-## How to contribute
-We welcome any friendly suggestions and helpful contributions! Just create issues or submit pull requests.
+- `POST /api/execute`: 执行命令并返回结果
+  - 请求体: `{ "input": "命令或查询" }`
+  - 响应: `{ "logs": "命令输出", "result": "执行结果" }`
 
-Or contact @mannaandpoem via 📧email: mannaandpoem@gmail.com
+- `GET /api/status/:request_id`: 获取请求的当前状态
+  - 响应: `{ "completed": false, "logs": "当前日志" }` 或 `{ "completed": true, "logs": "完整日志", "result": "执行结果" }`
 
-## Roadmap
-- [ ] Better Planning
-- [ ] Live Demos
-- [ ] Replay
-- [ ] RL Fine-tuned Models
-- [ ] Comprehensive Benchmarks
+- `GET /api/logs`: 获取所有日志文件列表
+  - 响应: 日志文件列表，包含名称、路径和创建时间
 
-## Acknowledgement
+- `GET /api/logs/:filename`: 获取特定日志文件的内容
+  - 响应: 日志文件的文本内容
 
-Thanks to [anthropic-computer-use](https://github.com/anthropics/anthropic-quickstarts/tree/main/computer-use-demo) and [broswer-use](https://github.com/browser-use/browser-use) for providing basic support for this project!
+## 使用示例
 
-OpenManus is built by contributors from MetaGPT. Huge thanks to this agent community!
+1. 打开浏览器访问 http://localhost:3000
+2. 在输入框中输入命令，例如 `ls -la`
+3. 点击"提交"按钮
+4. 查看命令执行的日志和结果
+
+## 安全注意事项
+
+此应用允许执行任意命令，应该只在受控环境中使用，并且只允许受信任的用户访问。在生产环境中，应该实施适当的安全措施，如身份验证和命令验证。

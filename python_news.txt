@@ -1,0 +1,4 @@
+Python News:
+- New release of Python 3.9.6 is now available.
+- The next Python Language Summit will be held in October 2023.
+- A new tutorial on Python for beginners has been published.

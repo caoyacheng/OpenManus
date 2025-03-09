@@ -179,3 +179,5 @@ data/
 
 # Workspace
 workspace/
+
+backend/node_modules/
